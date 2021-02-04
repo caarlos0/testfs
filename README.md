@@ -9,7 +9,7 @@ PS: This lib only works on Go 1.16+.
 
 ```go
 func TestSomething(t *testing.T) {
-	tmpfs := testfs.NewTestFS(t)
+	tmpfs := testfs.New(t)
 	testfile := "foo/bar/foobar"
 	_ = tmpfs.MkdirAll(filepath.Dir(testfile), 0o764)
 	_= tmpfs.WriteFile(testfile, []byte("example"), 0o644)

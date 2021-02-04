@@ -17,8 +17,8 @@ type TestFS struct {
 	path string
 }
 
-// NewTestFS creates a new fs.FS using the tb.TempDir as root.
-func NewTestFS(tb testing.TB) TestFS {
+// New creates a new fs.FS using the tb.TempDir as root.
+func New(tb testing.TB) TestFS {
 	tb.Helper()
 
 	path := tb.TempDir()

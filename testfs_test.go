@@ -11,7 +11,7 @@ import (
 var _ fs.FS = TestFS{}
 
 func ExampleNewTestFS() {
-	tmpfs := NewTestFS(&testing.T{})
+	tmpfs := New(&testing.T{})
 	_ = tmpfs.MkdirAll("foo/bar", 0o764)
 	_ = tmpfs.WriteFile("foo/bar/foobar", []byte("example"), 0o644)
 	bts, _ := fs.ReadFile(tmpfs, "foo/bar/foobar")
@@ -20,7 +20,7 @@ func ExampleNewTestFS() {
 }
 
 func TestTestFS(t *testing.T) {
-	tmpfs := NewTestFS(t)
+	tmpfs := New(t)
 
 	testfile := "foo/bar/foobar"
 

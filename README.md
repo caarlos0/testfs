@@ -18,7 +18,7 @@ func TestSomething(t *testing.T) {
 	// fs.WalkDir(tmpfs, ".", func(path string, d fs.DirEntry, err error) error { return nil })
 
 	// and read files of course:
-	bts, _ := fs.ReadFile(testfile)
+	bts, _ := fs.ReadFile(tmpfs, testfile)
 	fmt.Println(string(bts))
 }
 ```

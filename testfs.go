@@ -11,14 +11,14 @@ import (
 	"testing"
 )
 
-// TestFS is a fs.FS made for testing only.
-type TestFS struct {
+// FS is a fs.FS made for testing only.
+type FS struct {
 	fs.FS
 	path string
 }
 
-// New creates a new fs.FS using the tb.TempDir as root.
-func New(tb testing.TB) TestFS {
+// New creates a new FS using the tb.TempDir as root.
+func New(tb testing.TB) FS {
 	tb.Helper()
 
 	path := tb.TempDir()
@@ -27,18 +27,18 @@ func New(tb testing.TB) TestFS {
 	if err != nil {
 		tb.Fatalf("failed to create test fs at %s: %s", path, err)
 	}
-	return TestFS{
+	return FS{
 		FS:   tmpfs,
 		path: path,
 	}
 }
 
-// WriteFile writes a file to TestFS.
-func (t TestFS) WriteFile(name string, data []byte, perm os.FileMode) error {
+// WriteFile writes a file to FS.
+func (t FS) WriteFile(name string, data []byte, perm os.FileMode) error {
 	return os.WriteFile(filepath.Join(t.path, name), data, perm)
 }
 
-// MkdirAll creates the dir and all the necessary parents into TestFS.
-func (t TestFS) MkdirAll(path string, perm os.FileMode) error {
+// MkdirAll creates the dir and all the necessary parents into FS.
+func (t FS) MkdirAll(path string, perm os.FileMode) error {
 	return os.MkdirAll(filepath.Join(t.path, path), perm)
 }

@@ -8,9 +8,9 @@ import (
 	"testing/fstest"
 )
 
-var _ fs.FS = TestFS{}
+var _ fs.FS = FS{}
 
-func ExampleNewTestFS() {
+func ExampleNew() {
 	tmpfs := New(&testing.T{})
 	_ = tmpfs.MkdirAll("foo/bar", 0o764)
 	_ = tmpfs.WriteFile("foo/bar/foobar", []byte("example"), 0o644)
@@ -19,7 +19,7 @@ func ExampleNewTestFS() {
 	//output: example
 }
 
-func TestTestFS(t *testing.T) {
+func TestFS(t *testing.T) {
 	tmpfs := New(t)
 
 	testfile := "foo/bar/foobar"

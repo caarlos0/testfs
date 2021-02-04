@@ -12,7 +12,7 @@ func TestSomething(t *testing.T) {
 	tmpfs := testfs.New(t)
 	testfile := "foo/bar/foobar"
 	_ = tmpfs.MkdirAll(filepath.Dir(testfile), 0o764)
-	_= tmpfs.WriteFile(testfile, []byte("example"), 0o644)
+	_ = tmpfs.WriteFile(testfile, []byte("example"), 0o644)
 
 	// you can now use tmpfs as a fs.FS...
 	// fs.WalkDir(tmpfs, ".", func(path string, d fs.DirEntry, err error) error { return nil })

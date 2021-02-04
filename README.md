@@ -32,3 +32,8 @@ in-memory implementation that might not do the same thing as a real FS.
 This is a real FS, it only limits itself to a temporary directory and
 cleans after itself once the test is done. You also get a couple of helper
 methods to create the structure you need.
+
+## Other options
+
+If you don't mind testing against an in-memory implementation, the native
+`fstest.MemFS` is a good option.

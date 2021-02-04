@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"path/filepath"
 	"testing"
+	"testing/fstest"
 )
 
 var _ fs.FS = TestFS{}
@@ -38,21 +39,7 @@ func TestTestFS(t *testing.T) {
 		t.Fatalf("invalid %s contents, got %s, want %s", testfile, string(bts), "example")
 	}
 
-	var paths []string
-	if err := fs.WalkDir(tmpfs, ".", func(path string, d fs.DirEntry, err error) error {
-		paths = append(paths, path)
-		return nil
-	}); err != nil {
-		t.Fatalf("failed to walk fs: %s", err)
-	}
-
-	expectedPaths := []string{".", "foo", "foo/bar", "foo/bar/foobar"}
-	if len(paths) != len(expectedPaths) {
-		t.Fatalf("expected %d paths, got %d. Paths: %s", len(expectedPaths), len(paths), paths)
-	}
-	for i := range expectedPaths {
-		if paths[i] != expectedPaths[i] {
-			t.Fatalf("expected paths[%d] to be %s, was %s", i, expectedPaths[i], paths[i])
-		}
+	if err := fstest.TestFS(tmpfs, "foo/bar/foobar"); err != nil {
+		t.Fatalf("failed to check fs: %s", err)
 	}
 }

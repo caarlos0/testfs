@@ -23,12 +23,8 @@ func New(tb testing.TB) FS {
 
 	path := tb.TempDir()
 	tb.Logf("creating testFS at %s", path)
-	tmpfs, err := fs.Sub(os.DirFS(path), ".")
-	if err != nil {
-		tb.Fatalf("failed to create test fs at %s: %s", path, err)
-	}
 	return FS{
-		FS:   tmpfs,
+		FS:   os.DirFS(path),
 		path: path,
 	}
 }

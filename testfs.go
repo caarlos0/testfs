@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -24,7 +25,7 @@ func New(tb testing.TB) FS {
 	path := tb.TempDir()
 	tb.Logf("creating testFS at %s", path)
 	return FS{
-		FS:   os.DirFS(path),
+		FS:   dirFS(path),
 		path: path,
 	}
 }
@@ -37,4 +38,32 @@ func (t FS) WriteFile(name string, data []byte, perm os.FileMode) error {
 // MkdirAll creates the dir and all the necessary parents into FS.
 func (t FS) MkdirAll(path string, perm os.FileMode) error {
 	return os.MkdirAll(filepath.Join(t.path, path), perm)
+}
+
+func (t FS) Symlink(oldname, newname string) error {
+	return os.Symlink(filepath.Join(t.path, oldname), filepath.Join(t.path, newname))
+}
+
+// dirFS copies os.DirFS but prevents reading links to files outside the FS.
+type dirFS string
+
+func (dir dirFS) Open(name string) (fs.File, error) {
+	if !fs.ValidPath(name) {
+		return nil, &os.PathError{Op: "open", Path: name, Err: os.ErrInvalid}
+	}
+	path := string(dir) + "/" + name
+	info, err := os.Lstat(path)
+	if err != nil {
+		return nil, &os.PathError{Op: "open", Path: name, Err: err}
+	}
+	if info.Mode()&os.ModeSymlink == os.ModeSymlink {
+		lpath, err := os.Readlink(path)
+		if err != nil {
+			return nil, &os.PathError{Op: "open", Path: name, Err: err}
+		}
+		if !strings.HasPrefix(lpath, string(dir)) {
+			return nil, &os.PathError{Op: "open", Path: name, Err: os.ErrInvalid}
+		}
+	}
+	return os.Open(path)
 }

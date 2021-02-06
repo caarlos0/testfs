@@ -29,6 +29,11 @@ func New(tb testing.TB) FS {
 	}
 }
 
+// Path returns the FS root path.
+func (t FS) Path() string {
+	return t.path
+}
+
 // WriteFile writes a file to FS.
 func (t FS) WriteFile(name string, data []byte, perm os.FileMode) error {
 	return os.WriteFile(filepath.Join(t.path, name), data, perm)

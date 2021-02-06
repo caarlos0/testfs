@@ -22,6 +22,10 @@ func ExampleNew() {
 func TestFS(t *testing.T) {
 	tmpfs := New(t)
 
+	if tmpfs.Path() != tmpfs.path {
+		t.Fatalf("expected Path to be %s, got %s", tmpfs.path, tmpfs.Path())
+	}
+
 	testfile := "foo/bar/foobar"
 
 	if err := tmpfs.MkdirAll(filepath.Dir(testfile), 0o764); err != nil {

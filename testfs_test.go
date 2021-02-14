@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"testing/fstest"
 )
@@ -29,12 +30,17 @@ func TestFS(t *testing.T) {
 	content := "example"
 	testfile := "foo/bar/foobar"
 	testfile2 := "asd/sada/aaaa"
+	absFile := "/tmp/foo/foobar"
+	if runtime.GOOS == "windows" {
+		vol := filepath.VolumeName(tmpfs.Path())
+		absFile = vol + "\\foo\\foobar"
+	}
 
-	if err := tmpfs.MkdirAll("/tmp/asd", 0o700); err == nil {
+	if err := tmpfs.MkdirAll(absFile, 0o700); err == nil {
 		t.Fatalf("expected to fail")
 	}
 
-	if err := tmpfs.WriteFile("/tmp/asd", []byte(content), 0o700); err == nil {
+	if err := tmpfs.WriteFile(absFile, []byte(content), 0o700); err == nil {
 		t.Fatalf("expected to fail")
 	}
 

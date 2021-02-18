@@ -23,7 +23,10 @@ type FS struct {
 func New(tb testing.TB) FS {
 	tb.Helper()
 
-	path := tb.TempDir()
+	path, err := filepath.EvalSymlinks(tb.TempDir())
+	if err != nil {
+		tb.Fatalf("failed to create testfs: %s", err)
+	}
 	tb.Logf("creating testFS at %s", path)
 	return FS{
 		FS:   os.DirFS(path),

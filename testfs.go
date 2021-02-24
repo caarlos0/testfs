@@ -15,7 +15,7 @@ import (
 
 // FS is a fs.FS made for testing only.
 type FS struct {
-	fs.FS
+	FS   fs.FS
 	path string
 }
 
@@ -37,31 +37,40 @@ func New(tb testing.TB) FS {
 	}
 }
 
+// Open opens the named file.
+func (t FS) Open(name string) (fs.File, error) {
+	return t.FS.Open(filepath.ToSlash(name))
+}
+
 // Path returns the FS root path.
 func (t FS) Path() string {
 	return t.path
 }
 
+// ErrOutsideFS happens when the user tries to handle files outside of the FS's
+// root path.
 var ErrOutsideFS = fmt.Errorf("path is outside test fs root folder")
 
 // WriteFile writes a file to FS.
 func (t FS) WriteFile(name string, data []byte, perm os.FileMode) error {
+	name = filepath.ToSlash(name)
 	if filepath.IsAbs(name) {
 		if strings.HasPrefix(name, t.path) {
 			return os.WriteFile(name, data, perm)
 		}
 		return fmt.Errorf("%s: %w", name, ErrOutsideFS)
 	}
-	return os.WriteFile(filepath.Join(t.path, name), data, perm)
+	return os.WriteFile(filepath.ToSlash(filepath.Join(t.path, name)), data, perm)
 }
 
 // MkdirAll creates the dir and all the necessary parents into FS.
 func (t FS) MkdirAll(path string, perm os.FileMode) error {
+	path = filepath.ToSlash(path)
 	if filepath.IsAbs(path) {
 		if strings.HasPrefix(path, t.path) {
 			return os.MkdirAll(path, perm)
 		}
 		return fmt.Errorf("%s: %w", path, ErrOutsideFS)
 	}
-	return os.MkdirAll(filepath.Join(t.path, path), perm)
+	return os.MkdirAll(filepath.ToSlash(filepath.Join(t.path, path)), perm)
 }

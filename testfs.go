@@ -27,6 +27,9 @@ func New(tb testing.TB) FS {
 	if err != nil {
 		tb.Fatalf("failed to create testfs: %s", err)
 	}
+
+	path = filepath.ToSlash(path)
+
 	tb.Logf("creating testFS at %s", path)
 	return FS{
 		FS:   os.DirFS(path),

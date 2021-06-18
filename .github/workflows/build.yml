@@ -1,29 +1,76 @@
 name: build
-on: [push, pull_request]
+
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - 'main'
+
+env:
+  GO111MODULE: on
 
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.36
+          only-new-issues: true
+
+  test:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go-version: [1.16]
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    env:
-      GO111MODULE: "on"
+        go-version:
+          - 1.16
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
     steps:
-      - name: Install Go
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Go
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go-version }}
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Download Go modules
+      -
+        name: Download Go modules
         run: go mod download
-
-      - name: Build
-        run: go build -v ./...
-
-      - name: Test
+      -
+        name: Test
         run: go test ./...
+
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - lint
+      - test
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      -
+        name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      -
+        name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
